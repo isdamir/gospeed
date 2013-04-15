@@ -1,0 +1,29 @@
+{
+	"folders":
+	[
+		{
+			"path": "web"
+		},
+		{
+			"path": "validate"
+		},
+		{
+			"path": "utils"
+		},
+		{
+			"path": "log"
+		},
+		{
+			"path": "middleware"
+		},
+		{
+			"path": "jsonstate"
+		},
+		{
+			"path": "config"
+		},
+		{
+			"path": "browser"
+		}
+	]
+}

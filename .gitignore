@@ -1,0 +1,7 @@
+.*
+*.swp
+*.bak
+*.exe
+src/src
+src/tmp/*
+!.gitignore
