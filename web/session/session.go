@@ -16,6 +16,7 @@ type SessionStore interface {
 	Delete(key interface{}) error     //delete session value
 	SessionID() string                //back current sessionID
 	SessionRelease()                  // release the resource
+	Map() map[interface{}]interface{}
 }
 
 type Provider interface {

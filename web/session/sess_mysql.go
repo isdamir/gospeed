@@ -23,6 +23,9 @@ type MysqlSessionStore struct {
 	values map[interface{}]interface{}
 }
 
+func (st *MysqlSessionStore) Map() map[interface{}]interface{} {
+	return st.values
+}
 func (st *MysqlSessionStore) Set(key, value interface{}) error {
 	st.lock.Lock()
 	defer st.lock.Unlock()

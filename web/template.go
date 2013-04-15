@@ -68,33 +68,6 @@ func IsTemplate(path string) (b bool) {
 	return false
 }
 
-// func (self *templatefile) visit(paths string, f os.FileInfo, err error) error {
-// 	if f == nil {
-// 		return err
-// 	}
-// 	if f.IsDir() {
-// 		return nil
-// 	} else if (f.Mode() & os.ModeSymlink) > 0 {
-// 		return nil
-// 	} else {
-
-// 			replace := strings.NewReplacer("\\", "/")
-// 			a := []byte(paths)
-// 			a = a[len([]byte(self.root)):]
-// 			subdir := path.Dir(strings.TrimLeft(replace.Replace(string(a)), "/"))
-// 			if _, ok := self.files[subdir]; ok {
-// 				self.files[subdir] = append(self.files[subdir], paths)
-// 			} else {
-// 				m := make([]string, 1)
-// 				m[0] = paths
-// 				self.files[subdir] = m
-// 			}
-
-// 		}
-// 	}
-// 	return nil
-// }
-
 func AddTemplateExt(ext string) {
 	for _, v := range TemplateExt {
 		if v == ext {
@@ -121,7 +94,6 @@ func WatchTemplate() (err error) {
 		log.Debug("filepath.Walk() returned %v\n", err)
 		return
 	}
-	//buildAllTemplate(AppConfig.ViewsPath)
 	templateEven.Watch(AppConfig.ViewsPath)
 	go startWatch()
 	return
@@ -208,17 +180,18 @@ func buildTemplate(file string) {
 		return
 	}
 	log.Debug("build template", file)
-	//g, err := GlobalTemplate().Clone()
-	//t := template.New("test")
 	b, err := ioutil.ReadFile(file)
 	if err != nil {
 		return
 	}
 	s := string(b)
-	g, _ := GlobalTemplate().Clone()
-	t, err := g.New(file).Parse(s)
-	if err == nil && t != nil {
-		Templates[file] = t
+	g := GlobalTemplate()
+	if g != nil {
+		g, _ = g.Clone()
+		t, err := g.New(file).Parse(s)
+		if err == nil && t != nil {
+			Templates[file] = t
+		}
 	}
 }
 

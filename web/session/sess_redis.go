@@ -11,6 +11,9 @@ type RedisSessionStore struct {
 	sid string
 }
 
+func (st *RedisSessionStore) Map() map[interface{}]interface{} {
+	return nil
+}
 func (rs *RedisSessionStore) Set(key, value interface{}) error {
 	_, err := rs.c.Do("HSET", rs.sid, key, value)
 	return err

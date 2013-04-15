@@ -21,6 +21,9 @@ type FileSessionStore struct {
 	values map[interface{}]interface{}
 }
 
+func (st *FileSessionStore) Map() map[interface{}]interface{} {
+	return st.values
+}
 func (fs *FileSessionStore) Set(key, value interface{}) error {
 	fs.lock.Lock()
 	defer fs.lock.Unlock()
