@@ -194,6 +194,13 @@ func buildTemplate(file string) {
 		} else {
 			log.Debug(err)
 		}
+	} else {
+		t, err := template.New(file).Parse(s)
+		if err == nil && t != nil {
+			Templates[file] = t
+		} else {
+			log.Debug(err)
+		}
 	}
 }
 

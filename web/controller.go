@@ -103,7 +103,9 @@ func (c *Controller) RenderBytes() ([]byte, error) {
 		c.TplName = fmt.Sprint(path.Join(c.ChildName, c.Ctx.Request.Method), ".", c.TplExt)
 	}
 	c.Data["Custom"] = AppConfig.Custom
-	c.Data["Session"] = c.Ctx.SessionStore.Map()
+	if c.Ctx.sessionStart {
+		c.Data["Session"] = c.Ctx.SessionStore.Map()
+	}
 	if len(c.TplIn) > 0 {
 		for k, v := range c.TplIn {
 			buf, err := RenderTemplate(v, c.Data)
