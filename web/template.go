@@ -144,30 +144,30 @@ func buildAllTemplate(dir string) (err error) {
 func buildGlobalTemplate(dir string) {
 	if _, err := os.Stat(dir); err != nil {
 		log.Debug(err)
-		return
-	}
-	var file []string
-	err := filepath.Walk(dir, func(pa string, f os.FileInfo, err error) error {
-		if f == nil {
-			return err
-		}
-		if f.IsDir() || (f.Mode()&os.ModeSymlink) > 0 {
-			return nil
-		} else {
-			if IsTemplate(pa) {
-				file = append(file, pa)
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		log.Debug("filepath.Walk() returned %v\n", err)
-	}
-	t, err := template.New("speedTemplateGlobal").Funcs(speedTplFuncMap).ParseFiles(file...)
-	if err == nil && t != nil {
-		globalTemplate = t
 	} else {
-		log.Warn(err)
+		var file []string
+		err := filepath.Walk(dir, func(pa string, f os.FileInfo, err error) error {
+			if f == nil {
+				return err
+			}
+			if f.IsDir() || (f.Mode()&os.ModeSymlink) > 0 {
+				return nil
+			} else {
+				if IsTemplate(pa) {
+					file = append(file, pa)
+				}
+			}
+			return nil
+		})
+		if err != nil {
+			log.Debug("filepath.Walk() returned %v\n", err)
+		}
+		t, err := template.New("speedTemplateGlobal").Funcs(speedTplFuncMap).ParseFiles(file...)
+		if err == nil && t != nil {
+			globalTemplate = t
+		} else {
+			log.Warn(err)
+		}
 	}
 	buildAllTemplate(AppConfig.ViewsPath)
 }
@@ -191,6 +191,8 @@ func buildTemplate(file string) {
 		t, err := g.New(file).Parse(s)
 		if err == nil && t != nil {
 			Templates[file] = t
+		} else {
+			log.Debug(err)
 		}
 	}
 }
@@ -213,8 +215,12 @@ func RenderTemplate(file string, data map[string]interface{}) (wr *bytes.Buffer,
 	t := GetTemplate(file)
 	if t != nil {
 		err = t.ExecuteTemplate(wr, file, data)
+		if err != nil {
+			log.Debug("Render:", file, err)
+		}
 	} else {
 		errors.New("no template")
+		log.Debug("Render:", file, "no template")
 	}
 	return
 }

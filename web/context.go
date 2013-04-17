@@ -90,21 +90,36 @@ func (ctx *Context) InitInput() *url.Values {
 	return ctx.Params
 }
 
-func (ctx *Context) GetString(key string) string {
+//获取传递的参数并转化为string
+func (ctx *Context) ParamString(key string) string {
 	return ctx.InitInput().Get(key)
 }
 
-func (ctx *Context) GetInt(key string) (int64, error) {
+//获取传递的参数并转化为Int64
+func (ctx *Context) ParamInt64(key string) (int64, error) {
 	return strconv.ParseInt(ctx.InitInput().Get(key), 10, 64)
 }
 
-func (ctx *Context) GetBool(key string) (bool, error) {
+//获取传递的参数并转化为Int64
+func (ctx *Context) ParamBool(key string) (bool, error) {
 	return strconv.ParseBool(ctx.InitInput().Get(key))
 }
 
-func (ctx *Context) GetFile(key string) (multipart.File, *multipart.FileHeader, error) {
+//获取传递的文件
+func (ctx *Context) ParamFile(key string) (multipart.File, *multipart.FileHeader, error) {
 	ctx.InitInput()
 	return ctx.Request.FormFile(key)
+}
+
+//获取传递的参数并转化为int
+func (ctx *Context) ParamInt(key string) (int, error) {
+	i, err := strconv.ParseInt(ctx.InitInput().Get(key), 10, 64)
+	return int(i), err
+}
+
+//获取传递的参数并转化为float64
+func (ctx *Context) ParamFloat64(key string) (float64, error) {
+	return strconv.ParseFloat(ctx.InitInput().Get(key), 64)
 }
 
 //返回一个session.SessionStore
