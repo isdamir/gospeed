@@ -14,6 +14,7 @@ type BrowserCheck struct {
 	IsIe      bool
 	IeVersion int
 	com       *regexp.Regexp
+	UserAgent string
 }
 
 func NewCheck() *BrowserCheck {
@@ -33,12 +34,14 @@ func (this *BrowserCheck) Parser(h *http.Request) {
 		this.mobile++
 	}
 	ua := h.UserAgent()
+	this.UserAgent = ua
+	ua = strings.ToLower(ua)
 	if b, err := regexp.MatchString("(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone)", ua); err == nil {
 		if b {
 			this.mobile++
 		}
 	}
-	m := []string{"w3c ", "acs-", "alav", "alca", "amoi", "audi", "avan", "benq", "bird", "blac",
+	m := []string{"android", "uc", "mobile", "w3c ", "acs-", "alav", "alca", "amoi", "audi", "avan", "benq", "bird", "blac",
 		"blaz", "brew", "cell", "cldc", "cmd-", "dang", "doco", "eric", "hipt", "inno",
 		"ipaq", "java", "jigs", "kddi", "keji", "leno", "lg-c", "lg-d", "lg-g", "lge-",
 		"maui", "maxo", "midp", "mits", "mmef", "mobi", "mot-", "moto", "mwbp", "nec-",

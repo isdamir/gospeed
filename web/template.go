@@ -5,6 +5,7 @@ package web
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"github.com/howeyc/fsnotify"
 	"html/template"
 	"io/ioutil"
@@ -179,6 +180,7 @@ func buildTemplate(file string) {
 		log.Debug(err)
 		return
 	}
+	file = strings.Replace(file, "//", "/", -1)
 	log.Debug("build template", file)
 	b, err := ioutil.ReadFile(file)
 	if err != nil {
@@ -188,14 +190,14 @@ func buildTemplate(file string) {
 	g := GlobalTemplate()
 	if g != nil {
 		g, _ = g.Clone()
-		t, err := g.New(file).Parse(s)
+		t, err := g.New(file).Funcs(speedTplFuncMap).Parse(s)
 		if err == nil && t != nil {
 			Templates[file] = t
 		} else {
 			log.Debug(err)
 		}
 	} else {
-		t, err := template.New(file).Parse(s)
+		t, err := template.New(file).Funcs(speedTplFuncMap).Parse(s)
 		if err == nil && t != nil {
 			Templates[file] = t
 		} else {
@@ -214,10 +216,13 @@ func GlobalTemplate() (t *template.Template) {
 func GetTemplate(file string) (t *template.Template) {
 	return Templates[file]
 }
+func ExsitTemplate(file string) bool {
+	_, b := Templates[fmt.Sprint(AppConfig.ViewsPath, file)]
+	return b
+}
 
 //解析模板
 func RenderTemplate(file string, data map[string]interface{}) (wr *bytes.Buffer, err error) {
-	file = AppConfig.ViewsPath + file
 	wr = &bytes.Buffer{}
 	t := GetTemplate(file)
 	if t != nil {

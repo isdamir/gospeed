@@ -80,6 +80,7 @@ func (app *App) Start() {
 		}
 		err = fcgi.Serve(l, app.Handlers)
 	} else {
+		log.Debug(addr)
 		err = http.ListenAndServe(addr, app.Handlers)
 	}
 	if err != nil {

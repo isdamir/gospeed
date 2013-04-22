@@ -2,6 +2,7 @@ package web
 
 import (
 	"fmt"
+	"iyf.cc/gospeed/browser"
 	. "iyf.cc/gospeed/log"
 	"net/http"
 	"net/url"
@@ -325,7 +326,9 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	}
 
 	if runrouter != nil {
-		ct := &Context{ResponseWriter: w, Request: r, UrlParams: params} //创建上下文对象,在filter中也可以处理上下文,相较于来说,filter只是比controller具有优先执行权限,如果在filter中执行后结束了,那么controller不会被执行,这种需求一般用于全局校验/
+		b := browser.NewCheck()
+		b.Parser(r)
+		ct := &Context{ResponseWriter: w, Request: r, UrlParams: params, Browser: b} //创建上下文对象,在filter中也可以处理上下文,相较于来说,filter只是比controller具有优先执行权限,如果在filter中执行后结束了,那么controller不会被执行,这种需求一般用于全局校验/
 		//如果没有满足条件的router,也就是找不到要处理的controller,filter也不会执行.
 		//execute middleware filters
 		for _, filter := range p.filters {

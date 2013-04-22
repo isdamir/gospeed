@@ -2,6 +2,7 @@ package web
 
 import (
 	"fmt"
+	"iyf.cc/gospeed/browser"
 	"iyf.cc/gospeed/utils"
 	"iyf.cc/gospeed/web/session"
 	"mime"
@@ -20,6 +21,7 @@ type Context struct {
 	Params         *url.Values
 	SessionStore   session.SessionStore
 	sessionStart   bool
+	Browser        *browser.BrowserCheck
 }
 
 func (ctx *Context) WriteString(content string) {

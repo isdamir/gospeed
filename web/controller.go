@@ -103,6 +103,7 @@ func (c *Controller) RenderBytes() ([]byte, error) {
 		c.TplName = fmt.Sprint(path.Join(c.ChildName, c.Ctx.Request.Method), ".", c.TplExt)
 	}
 	c.Data["Custom"] = AppConfig.Custom
+	c.Data["Browser"] = c.Ctx.Browser
 	if c.Ctx.sessionStart {
 		c.Data["Session"] = c.Ctx.SessionStore.Map()
 	}
@@ -127,8 +128,8 @@ func (c *Controller) Redirect(url string, code int) {
 	c.Ctx.Redirect(url, code)
 }
 
-func (c *Controller) ServeJson() {
-	content, err := json.MarshalIndent(c.Data, "", "  ")
+func (c *Controller) ServeJson(data interface{}) {
+	content, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
@@ -138,8 +139,8 @@ func (c *Controller) ServeJson() {
 	c.Ctx.ResponseWriter.Write(content)
 }
 
-func (c *Controller) ServeXml() {
-	content, err := xml.Marshal(c.Data)
+func (c *Controller) ServeXml(data interface{}) {
+	content, err := xml.Marshal(data)
 	if err != nil {
 		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
@@ -147,4 +148,21 @@ func (c *Controller) ServeXml() {
 	c.Ctx.SetHeader("Content-Length", strconv.Itoa(len(content)), true)
 	c.Ctx.ContentType("xml")
 	c.Ctx.ResponseWriter.Write(content)
+}
+
+//针对不同浏览器进行解析
+func (c *Controller) TemplatePath(path, ext string) string {
+	if c.Ctx.Browser.IsMobile {
+		if c.Ctx.Browser.IsWml {
+			t := fmt.Sprintf("%s_wml.%s", path, ext)
+			if ExsitTemplate(t) {
+				return t
+			}
+		}
+		t := fmt.Sprintf("%s_html5.%s", path, ext)
+		if ExsitTemplate(t) {
+			return t
+		}
+	}
+	return fmt.Sprintf("%s.%s", path, ext)
 }
