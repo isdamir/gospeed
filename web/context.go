@@ -18,8 +18,8 @@ type Context struct {
 	ResponseWriter http.ResponseWriter
 	Request        *http.Request
 	UrlParams      map[string]string
-	SessionStore   session.SessionStore
 	Browser        *browser.BrowserCheck
+	sessionStore   session.SessionStore
 	params         *url.Values
 	sessionStart   bool
 }
@@ -125,13 +125,12 @@ func (ctx *Context) ParamFloat64(key string) (float64, error) {
 }
 
 //返回一个session.SessionStore
-//如果需要直接对这个对象操作才需要调用
 func (ctx *Context) Session() (sess session.SessionStore) {
 	if !ctx.sessionStart {
-		ctx.SessionStore = GlobalSessions.SessionStart(ctx.ResponseWriter, ctx.Request)
+		ctx.sessionStore = GlobalSessions.SessionStart(ctx.ResponseWriter, ctx.Request)
 		ctx.sessionStart = true
 	}
-	return ctx.SessionStore
+	return ctx.sessionStore
 }
 
 //用于释放session,主要是指文件保存时关闭文件

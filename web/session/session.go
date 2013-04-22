@@ -60,23 +60,22 @@ func NewManager(provideName, cookieName string, maxlifetime int64, savePath stri
 //get Session
 func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (session SessionStore) {
 	cookie, err := r.Cookie(manager.cookieName)
-	log.Debug("coockie", manager.cookieName, cookie, err)
 	if err != nil || cookie.Value == "" {
 		sid := manager.sessionId()
 		session, _ = manager.provider.SessionRead(sid)
-		cookie := http.Cookie{Name: manager.cookieName,
-			Value:    url.QueryEscape(sid),
-			Path:     "/",
-			HttpOnly: true,
-			Secure:   true}
+		cookie := http.Cookie{
+			Name:  manager.cookieName,
+			Value: url.QueryEscape(sid),
+			Path:  "/"}
 		cookie.Expires = time.Now().Add(time.Duration(manager.maxlifetime) * time.Second)
-		http.SetCookie(w, &cookie)
 		r.AddCookie(&cookie)
+		http.SetCookie(w, &cookie)
 	} else {
 		cookie.Expires = time.Now().Add(time.Duration(manager.maxlifetime) * time.Second)
-		http.SetCookie(w, cookie)
+		cookie.Path = "/"
 		sid, _ := url.QueryUnescape(cookie.Value)
 		session, _ = manager.provider.SessionRead(sid)
+		http.SetCookie(w, cookie)
 	}
 	return
 }
@@ -84,6 +83,7 @@ func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (se
 //Destroy sessionid
 func (manager *Manager) SessionDestroy(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie(manager.cookieName)
+	log.Debug("删除session")
 	if err != nil || cookie.Value == "" {
 		return
 	} else {

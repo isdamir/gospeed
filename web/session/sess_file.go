@@ -1,7 +1,10 @@
 package session
 
 import (
+	"bytes"
+	"encoding/gob"
 	"io/ioutil"
+	"iyf.cc/gospeed/log"
 	"os"
 	"path"
 	"path/filepath"
@@ -15,7 +18,7 @@ var (
 )
 
 type FileSessionStore struct {
-	f      *os.File
+	f      string
 	sid    string
 	lock   sync.RWMutex
 	values map[interface{}]interface{}
@@ -28,14 +31,12 @@ func (fs *FileSessionStore) Set(key, value interface{}) error {
 	fs.lock.Lock()
 	defer fs.lock.Unlock()
 	fs.values[key] = value
-	fs.updatecontent()
 	return nil
 }
 
 func (fs *FileSessionStore) Get(key interface{}) interface{} {
 	fs.lock.RLock()
 	defer fs.lock.RUnlock()
-	fs.updatecontent()
 	if v, ok := fs.values[key]; ok {
 		return v
 	} else {
@@ -48,7 +49,6 @@ func (fs *FileSessionStore) Delete(key interface{}) error {
 	fs.lock.Lock()
 	defer fs.lock.Unlock()
 	delete(fs.values, key)
-	fs.updatecontent()
 	return nil
 }
 
@@ -57,15 +57,16 @@ func (fs *FileSessionStore) SessionID() string {
 }
 
 func (fs *FileSessionStore) SessionRelease() {
-	fs.f.Close()
+	fs.updatecontent()
 }
 
 func (fs *FileSessionStore) updatecontent() {
+	fs.lock.Lock()
+	defer fs.lock.Unlock()
 	b, err := encodeGob(fs.values)
-	if err != nil {
-		return
+	if err == nil {
+		ioutil.WriteFile(fs.f, b, os.ModePerm)
 	}
-	fs.f.Write(b)
 }
 
 type FileProvider struct {
@@ -80,24 +81,21 @@ func (fp *FileProvider) SessionInit(maxlifetime int64, savePath string) error {
 }
 
 func (fp *FileProvider) SessionRead(sid string) (SessionStore, error) {
+	pf := path.Join(fp.savePath, string(sid[0]), string(sid[1]), sid)
 	err := os.MkdirAll(path.Join(fp.savePath, string(sid[0]), string(sid[1])), 0777)
 	if err != nil {
-		println(err.Error())
+		log.Debug(err)
 	}
-	_, err = os.Stat(path.Join(fp.savePath, string(sid[0]), string(sid[1]), sid))
-	var f *os.File
-	if err == nil {
-		f, err = os.OpenFile(path.Join(fp.savePath, string(sid[0]), string(sid[1]), sid), os.O_RDWR, 0777)
-	} else if os.IsNotExist(err) {
-		f, err = os.Create(path.Join(fp.savePath, string(sid[0]), string(sid[1]), sid))
-	} else {
-		return nil, err
-	}
-	os.Chtimes(path.Join(fp.savePath, string(sid[0]), string(sid[1]), sid), time.Now(), time.Now())
+	ss := &FileSessionStore{}
+	ss.sid = sid
+	ss.f = pf
+	ss.lock.RLock()
+	defer ss.lock.RUnlock()
 	var kv map[interface{}]interface{}
-	b, err := ioutil.ReadAll(f)
+	b, err := ioutil.ReadFile(pf)
 	if err != nil {
-		return nil, err
+		ss.values = make(map[interface{}]interface{})
+		return ss, err
 	}
 	if len(b) == 0 {
 		kv = make(map[interface{}]interface{})
@@ -107,9 +105,7 @@ func (fp *FileProvider) SessionRead(sid string) (SessionStore, error) {
 			return nil, err
 		}
 	}
-	f.Close()
-	f, err = os.Create(path.Join(fp.savePath, string(sid[0]), string(sid[1]), sid))
-	ss := &FileSessionStore{f: f, sid: sid, values: kv}
+	ss.values = kv
 	return ss, nil
 }
 
@@ -138,4 +134,33 @@ func gcpath(path string, info os.FileInfo, err error) error {
 
 func init() {
 	Register("file", filepder)
+	gob.Register([]interface{}{})
+	gob.Register(map[int]interface{}{})
+	gob.Register(map[string]interface{}{})
+	gob.Register(map[interface{}]interface{}{})
+	gob.Register(map[string]string{})
+	gob.Register(map[int]string{})
+	gob.Register(map[int]int{})
+	gob.Register(map[int]int64{})
+}
+
+func encodeGob(obj map[interface{}]interface{}) ([]byte, error) {
+	buf := bytes.NewBuffer(nil)
+	enc := gob.NewEncoder(buf)
+	err := enc.Encode(obj)
+	if err != nil {
+		return []byte(""), err
+	}
+	return buf.Bytes(), nil
+}
+
+func decodeGob(encoded []byte) (map[interface{}]interface{}, error) {
+	buf := bytes.NewBuffer(encoded)
+	dec := gob.NewDecoder(buf)
+	var out map[interface{}]interface{}
+	err := dec.Decode(&out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }

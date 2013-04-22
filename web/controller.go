@@ -5,7 +5,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"html/template"
-	. "iyf.cc/gospeed/log"
+	"iyf.cc/gospeed/log"
 	"net/http"
 	"path"
 	"strconv"
@@ -105,13 +105,13 @@ func (c *Controller) RenderBytes() ([]byte, error) {
 	c.Data["Custom"] = AppConfig.Custom
 	c.Data["Browser"] = c.Ctx.Browser
 	if c.Ctx.sessionStart {
-		c.Data["Session"] = c.Ctx.SessionStore.Map()
+		c.Data["Session"] = c.Ctx.Session().Map()
 	}
 	if len(c.TplIn) > 0 {
 		for k, v := range c.TplIn {
 			buf, err := RenderTemplate(v, c.Data)
 			if err != nil {
-				Debug(err)
+				log.Debug(err)
 				continue
 			}
 			c.Data[k] = template.HTML(buf.String())
@@ -119,7 +119,7 @@ func (c *Controller) RenderBytes() ([]byte, error) {
 	}
 	buf, err := RenderTemplate(c.TplName, c.Data)
 	if err != nil {
-		Trace("template Execute err:", err)
+		log.Trace("template Execute err:", err)
 	}
 	return buf.Bytes(), nil
 }
