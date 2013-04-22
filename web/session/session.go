@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
+	"iyf.cc/gospeed/log"
 	"net/http"
 	"net/url"
 	"time"
@@ -59,6 +60,7 @@ func NewManager(provideName, cookieName string, maxlifetime int64, savePath stri
 //get Session
 func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (session SessionStore) {
 	cookie, err := r.Cookie(manager.cookieName)
+	log.Debug("coockie", manager.cookieName, cookie, err)
 	if err != nil || cookie.Value == "" {
 		sid := manager.sessionId()
 		session, _ = manager.provider.SessionRead(sid)

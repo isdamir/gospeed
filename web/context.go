@@ -18,10 +18,10 @@ type Context struct {
 	ResponseWriter http.ResponseWriter
 	Request        *http.Request
 	UrlParams      map[string]string
-	Params         *url.Values
 	SessionStore   session.SessionStore
-	sessionStart   bool
 	Browser        *browser.BrowserCheck
+	params         *url.Values
+	sessionStart   bool
 }
 
 func (ctx *Context) WriteString(content string) {
@@ -79,76 +79,80 @@ func (ctx *Context) SetCookie(name string, value string, age int64) {
 	cookie := fmt.Sprintf("%s=%s; expires=%s", name, value, utils.WebTime(utctime))
 	ctx.SetHeader("Set-Cookie", cookie, false)
 }
-func (ctx *Context) InitInput() *url.Values {
-	if ctx.Params == nil {
+func (ctx *Context) Params() *url.Values {
+	if ctx.params == nil {
 		ct := ctx.Request.Header.Get("Content-Type")
 		if strings.Contains(ct, "multipart/form-data") {
 			ctx.Request.ParseMultipartForm(AppConfig.MaxMemory) //64MB
 		} else {
 			ctx.Request.ParseForm()
 		}
-		ctx.Params = &ctx.Request.Form
+		ctx.params = &ctx.Request.Form
 	}
-	return ctx.Params
+	return ctx.params
 }
 
 //获取传递的参数并转化为string
 func (ctx *Context) ParamString(key string) string {
-	return ctx.InitInput().Get(key)
+	return ctx.Params().Get(key)
 }
 
 //获取传递的参数并转化为Int64
 func (ctx *Context) ParamInt64(key string) (int64, error) {
-	return strconv.ParseInt(ctx.InitInput().Get(key), 10, 64)
+	return strconv.ParseInt(ctx.Params().Get(key), 10, 64)
 }
 
 //获取传递的参数并转化为Int64
 func (ctx *Context) ParamBool(key string) (bool, error) {
-	return strconv.ParseBool(ctx.InitInput().Get(key))
+	return strconv.ParseBool(ctx.Params().Get(key))
 }
 
 //获取传递的文件
 func (ctx *Context) ParamFile(key string) (multipart.File, *multipart.FileHeader, error) {
-	ctx.InitInput()
+	ctx.Params()
 	return ctx.Request.FormFile(key)
 }
 
 //获取传递的参数并转化为int
 func (ctx *Context) ParamInt(key string) (int, error) {
-	i, err := strconv.ParseInt(ctx.InitInput().Get(key), 10, 64)
+	i, err := strconv.ParseInt(ctx.Params().Get(key), 10, 64)
 	return int(i), err
 }
 
 //获取传递的参数并转化为float64
 func (ctx *Context) ParamFloat64(key string) (float64, error) {
-	return strconv.ParseFloat(ctx.InitInput().Get(key), 64)
+	return strconv.ParseFloat(ctx.Params().Get(key), 64)
 }
 
 //返回一个session.SessionStore
 //如果需要直接对这个对象操作才需要调用
-func (ctx *Context) InitSession() (sess session.SessionStore) {
+func (ctx *Context) Session() (sess session.SessionStore) {
 	if !ctx.sessionStart {
 		ctx.SessionStore = GlobalSessions.SessionStart(ctx.ResponseWriter, ctx.Request)
+		ctx.sessionStart = true
 	}
 	return ctx.SessionStore
 }
 
 //用于释放session,主要是指文件保存时关闭文件
 //方法一般不用手动调用
-func (ctx *Context) EndSession() {
-	if ctx.SessionStore != nil {
-		ctx.SessionStore.SessionRelease()
+func (ctx *Context) SessionRelease() {
+	if ctx.sessionStart {
+		ctx.Session().SessionRelease()
 	}
 }
 
-func (ctx *Context) SetSession(name string, value interface{}) {
-	ctx.InitSession().Set(name, value)
+func (ctx *Context) SessionSet(name string, value interface{}) {
+	ctx.Session().Set(name, value)
 }
 
-func (ctx *Context) GetSession(name string) interface{} {
-	return ctx.InitSession().Get(name)
+func (ctx *Context) SessionGet(name string) interface{} {
+	return ctx.Session().Get(name)
 }
 
-func (ctx *Context) DelSession(name string) {
-	ctx.InitSession().Delete(name)
+func (ctx *Context) SessionDel(name string) {
+	ctx.Session().Delete(name)
+}
+func (ctx *Context) SessionDestroy() {
+	GlobalSessions.SessionDestroy(ctx.ResponseWriter, ctx.Request)
 }

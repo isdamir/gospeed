@@ -223,6 +223,7 @@ func ExsitTemplate(file string) bool {
 
 //解析模板
 func RenderTemplate(file string, data map[string]interface{}) (wr *bytes.Buffer, err error) {
+	file = fmt.Sprint(AppConfig.ViewsPath, file)
 	wr = &bytes.Buffer{}
 	t := GetTemplate(file)
 	if t != nil {
