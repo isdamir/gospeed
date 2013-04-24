@@ -8,6 +8,7 @@ import (
 	"iyf.cc/gospeed/log"
 	"net/http"
 	"path"
+	"path/filepath"
 	"strconv"
 )
 
@@ -15,9 +16,9 @@ type Controller struct {
 	Ctx       *Context
 	Data      map[string]interface{}
 	ChildName string
-	TplName   string
+	tplName   string
 	//将这里面的模板进行解析,并将结果存到Data[key]中用于输出
-	TplIn  map[string]string
+	tplIn  map[string]string
 	TplExt string
 }
 
@@ -37,8 +38,8 @@ type ControllerInterface interface {
 
 func (c *Controller) Init(ctx *Context, cn string, up map[string]string) {
 	c.Data = make(map[string]interface{})
-	c.TplIn = make(map[string]string)
-	c.TplName = ""
+	c.tplIn = make(map[string]string)
+	c.tplName = ""
 	c.ChildName = cn
 	c.Ctx = ctx
 	c.TplExt = "html"
@@ -99,16 +100,16 @@ func (c *Controller) RenderString() (string, error) {
 }
 
 func (c *Controller) RenderBytes() ([]byte, error) {
-	if c.TplName == "" {
-		c.TplName = fmt.Sprint(path.Join(c.ChildName, c.Ctx.Request.Method), ".", c.TplExt)
+	if c.tplName == "" {
+		c.tplName = fmt.Sprint(path.Join(c.ChildName, c.Ctx.Request.Method), ".", c.TplExt)
 	}
 	c.Data["Custom"] = AppConfig.Custom
 	c.Data["Browser"] = c.Ctx.Browser
 	if c.Ctx.sessionStart {
 		c.Data["Session"] = c.Ctx.Session().Map()
 	}
-	if len(c.TplIn) > 0 {
-		for k, v := range c.TplIn {
+	if len(c.tplIn) > 0 {
+		for k, v := range c.tplIn {
 			buf, err := RenderTemplate(v, c.Data)
 			if err != nil {
 				log.Debug(err)
@@ -117,7 +118,7 @@ func (c *Controller) RenderBytes() ([]byte, error) {
 			c.Data[k] = template.HTML(buf.String())
 		}
 	}
-	buf, err := RenderTemplate(c.TplName, c.Data)
+	buf, err := RenderTemplate(c.tplName, c.Data)
 	if err != nil {
 		log.Trace("template Execute err:", err)
 	}
@@ -149,17 +150,29 @@ func (c *Controller) ServeXml(data interface{}) {
 	c.Ctx.ContentType("xml")
 	c.Ctx.ResponseWriter.Write(content)
 }
+func (c *Controller) ServeTpl(tplpath string) {
+	if AppConfig.AutoDevice {
+		ext := filepath.Ext(tplpath)
+		file := tplpath[:len(tplpath)-len(ext)]
+		c.tplName = c.templatePath(file, ext)
+	} else {
+		c.tplName = tplpath
+	}
+}
+func (c *Controller) ServetplIn(tplIn map[string]string) {
+	c.tplIn = tplIn
+}
 
 //针对不同浏览器进行解析
-func (c *Controller) TemplatePath(path, ext string) string {
+func (c *Controller) templatePath(path, ext string) string {
 	if c.Ctx.Browser.IsMobile {
 		if c.Ctx.Browser.IsWml {
-			t := fmt.Sprintf("%s_wml.%s", path, ext)
+			t := fmt.Sprintf("%s_wml%s", path, ext)
 			if ExsitTemplate(t) {
 				return t
 			}
 		}
-		t := fmt.Sprintf("%s_html5.%s", path, ext)
+		t := fmt.Sprintf("%s_html5%s", path, ext)
 		if ExsitTemplate(t) {
 			return t
 		}

@@ -34,6 +34,7 @@ type AppConfigData struct {
 	UseFcgi              bool
 	MaxMemory            int64
 	Custom               map[string]string //自定义信息
+	AutoDevice           bool              //自动设备处理
 }
 
 var (

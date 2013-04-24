@@ -51,17 +51,17 @@ func (p *ControllerRegistor) Add(pattern string, c ControllerInterface) {
 			// similar to expressjs: ‘/user/:id([0-9]+)’
 			if index := strings.Index(part, "("); index != -1 {
 				expr = part[index:]
-				part = part[:index]
+				part = part[1:index]
 				//match /user/:id:int ([0-9]+)
 				//match /post/:username:string	([\w]+)
 			} else if lindex := strings.LastIndex(part, ":"); lindex != 0 {
 				switch part[lindex:] {
 				case ":int":
 					expr = "([0-9]+)"
-					part = part[:lindex]
+					part = part[1:lindex]
 				case ":string":
 					expr = `([\w]+)`
-					part = part[:lindex]
+					part = part[1:lindex]
 				}
 			}
 			params[j] = part
@@ -71,14 +71,14 @@ func (p *ControllerRegistor) Add(pattern string, c ControllerInterface) {
 		if strings.HasPrefix(part, "*") {
 			expr := "(.+)"
 			if part == "*.*" {
-				params[j] = ":path"
+				params[j] = "path"
 				parts[i] = "([^.]+).([^.]+)"
 				j++
-				params[j] = ":ext"
+				params[j] = "ext"
 				j++
 			} else {
-				params[j] = ":splat"
 				parts[i] = expr
+				params[j] = "splat"
 				j++
 			}
 		}
@@ -270,6 +270,7 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	}
 
 	//first find path from the fixrouters to Improve Performance
+	//通过路径匹配,采用显示注册
 	for _, route := range p.fixrouters {
 		n := len(requestPath)
 		//route like "/"
