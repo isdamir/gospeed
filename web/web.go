@@ -35,6 +35,7 @@ type AppConfigData struct {
 	MaxMemory            int64
 	Custom               map[string]string //自定义信息
 	AutoDevice           bool              //自动设备处理
+	EnableGzip           bool              //是否启用gzip压缩
 }
 
 var (
