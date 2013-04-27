@@ -180,7 +180,7 @@ func buildTemplate(file string) {
 		log.Debug(err)
 		return
 	}
-	file = strings.Replace(file, "//", "/", -1)
+	file = strings.Replace(file, `\\`, "/", -1)
 	log.Debug("build template", file)
 	b, err := ioutil.ReadFile(file)
 	if err != nil {
