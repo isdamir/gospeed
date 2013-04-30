@@ -357,6 +357,33 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 		//if response has written,yes don't run next
 		if !w.started {
 			//通过switch来筛选,防止出现恶意的Method
+
+			//处理来自参数的信息
+			if v := r.Form.Get("action"); v != "" {
+				switch strings.ToLower(v) {
+				case "delete":
+					{
+						r.Method = "DELETE"
+					}
+				case "head":
+					{
+						r.Method = "HEAD"
+					}
+				case "patch":
+					{
+						r.Method = "PATCH"
+					}
+				case "options":
+					{
+						r.Method = "OPTIONS"
+					}
+				}
+			}
+			if v := r.PostForm.Get("action"); v != "" {
+				if strings.ToLower(v) == "put" {
+					r.Method = "PUT"
+				}
+			}
 			switch r.Method {
 			case "GET":
 				method = vc.MethodByName("Get")
