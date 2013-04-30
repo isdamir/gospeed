@@ -165,7 +165,7 @@ func (c *Config) startWatch() {
 				}
 			}
 		case err := <-c.w.Error:
-			log.Debug("error:", err)
+			log.Debug("config error:", err)
 		}
 	}
 }

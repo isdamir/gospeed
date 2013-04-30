@@ -105,7 +105,7 @@ func startWatch() {
 		select {
 		case v := <-templateEven.Event:
 			{
-				log.Debug("File:", v.String())
+				log.Trace("File:", v.String())
 				fi, err := os.Stat(v.Name)
 				if err == nil {
 					if v.IsCreate() || v.IsModify() || v.IsRename() {
@@ -124,7 +124,7 @@ func startWatch() {
 				}
 			}
 		case err := <-templateEven.Error:
-			log.Debug("error:", err)
+			log.Debug("template error:", err)
 		}
 	}
 }
@@ -181,7 +181,7 @@ func buildTemplate(file string) {
 		return
 	}
 	file = strings.Replace(file, "\\", "/", -1)
-	log.Debug("build template", file)
+	log.Trace("build template", file)
 	b, err := ioutil.ReadFile(file)
 	if err != nil {
 		return

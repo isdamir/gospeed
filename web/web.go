@@ -58,7 +58,7 @@ func init() {
 	}
 	log.SetLevel(AppConfig.LogLevel)
 	StaticDir["/static"] = "static"
-	log.Debug(*AppConfig, AppPath)
+	log.Trace(*AppConfig, AppPath)
 }
 
 type App struct {
