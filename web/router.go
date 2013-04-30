@@ -362,21 +362,21 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 			if v := r.Form.Get("action"); v != "" {
 				switch strings.ToLower(v) {
 				case "delete":
-					{
-						r.Method = "DELETE"
-					}
+					r.Method = "DELETE"
 				case "head":
-					{
-						r.Method = "HEAD"
-					}
+					r.Method = "HEAD"
 				case "patch":
-					{
-						r.Method = "PATCH"
-					}
+					r.Method = "PATCH"
 				case "options":
-					{
-						r.Method = "OPTIONS"
-					}
+					r.Method = "OPTIONS"
+				case "put":
+					r.Method = "PUT"
+				case "link":
+					r.Method = "LINK"
+				case "unlink":
+					r.Method = "UNLINK"
+				case "purge":
+					r.Method = "PURGE"
 				}
 			}
 			if v := r.PostForm.Get("action"); v != "" {
@@ -399,6 +399,12 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 				method = vc.MethodByName("Patch")
 			case "OPTIONS":
 				method = vc.MethodByName("Options")
+			case "LINK":
+				method = vc.MethodByName("Link")
+			case "UNLINK":
+				method = vc.MethodByName("UnLink")
+			case "PURGE":
+				method = vc.MethodByName("Purge")
 			default:
 				{
 					ct.WriteString("Method Is Illegal")

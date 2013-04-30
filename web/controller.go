@@ -35,6 +35,9 @@ type ControllerInterface interface {
 	Put()
 	Head()
 	Patch()
+	Link()
+	UnLink()
+	Purge()
 	Options()
 	Finish()
 	Render() error
@@ -81,6 +84,18 @@ func (c *Controller) Patch() {
 }
 
 func (c *Controller) Options() {
+	http.Error(c.Ctx.ResponseWriter, "Method Not Allowed", 405)
+}
+
+func (c *Controller) Link() {
+	http.Error(c.Ctx.ResponseWriter, "Method Not Allowed", 405)
+}
+
+func (c *Controller) UnLink() {
+	http.Error(c.Ctx.ResponseWriter, "Method Not Allowed", 405)
+}
+
+func (c *Controller) Purge() {
 	http.Error(c.Ctx.ResponseWriter, "Method Not Allowed", 405)
 }
 
