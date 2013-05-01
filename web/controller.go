@@ -208,6 +208,7 @@ func (c *Controller) ServeTpl(tplpath string) {
 		ext := filepath.Ext(tplpath)
 		file := tplpath[:len(tplpath)-len(ext)]
 		c.tplName = c.templatePath(file, ext)
+		log.Debug(file, ext)
 	} else {
 		c.tplName = tplpath
 	}
@@ -230,5 +231,5 @@ func (c *Controller) templatePath(path, ext string) string {
 			return t
 		}
 	}
-	return fmt.Sprintf("%s.%s", path, ext)
+	return fmt.Sprintf("%s%s", path, ext)
 }
