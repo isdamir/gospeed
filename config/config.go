@@ -161,7 +161,10 @@ func (c *Config) startWatch() {
 				}
 				if cf, ok := c.object[file]; ok {
 					log.Trace("read:", file)
-					readConfig(cf)
+					err := readConfig(cf)
+					if err != nil {
+						log.Warn(err)
+					}
 				}
 			}
 		case err := <-c.w.Error:
