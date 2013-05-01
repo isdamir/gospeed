@@ -224,15 +224,17 @@ func (c *Controller) ServetplIn(tplIn map[string]string) {
 //针对不同浏览器进行解析
 func (c *Controller) templatePath(path, ext string) string {
 	if c.Ctx.Browser.IsMobile {
-		if c.Ctx.Browser.IsWml {
-			t := fmt.Sprintf("%s_wml%s", path, ext)
+		if strings.Index(path, "_") == -1 {
+			if c.Ctx.Browser.IsWml {
+				t := fmt.Sprintf("%s_wml%s", path, ext)
+				if ExsitTemplate(t) {
+					return t
+				}
+			}
+			t := fmt.Sprintf("%s_wap%s", path, ext)
 			if ExsitTemplate(t) {
 				return t
 			}
-		}
-		t := fmt.Sprintf("%s_html5%s", path, ext)
-		if ExsitTemplate(t) {
-			return t
 		}
 	}
 	return fmt.Sprintf("%s%s", path, ext)
