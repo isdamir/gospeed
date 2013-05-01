@@ -155,7 +155,11 @@ func (c *Controller) RenderBytes() ([]byte, error) {
 	c.Data["Custom"] = AppConfig.Custom
 	c.Data["Browser"] = c.Ctx.Browser
 	if c.Ctx.sessionStart {
-		c.Data["Session"] = c.Ctx.Session().Map()
+		mp := c.Ctx.Session().Map()
+		if _, ok := mp["__ToUrl"]; ok {
+			mp["SessionID"] = c.Ctx.Session().SessionID()
+		}
+		c.Data["Session"] = mp
 	}
 	if len(c.tplIn) > 0 {
 		for k, v := range c.tplIn {

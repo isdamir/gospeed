@@ -58,7 +58,7 @@ func init() {
 	AppConfig.HttpPort = 80
 	AppConfig.RecoverPanic = true
 	AppConfig.AutoRender = true
-	AppConfig.ViewsPath = "/views"
+	AppConfig.ViewsPath = "views/"
 	AppConfig.RunMode = "pro"
 	AppConfig.SessionOn = true
 	AppConfig.SessionProvider = "memory"
@@ -175,7 +175,7 @@ func Start() {
 		SpeedApp.Router(`/debug/pprof/:pp([\w]+)`, &ProfController{})
 	}
 	if AppConfig.SessionOn {
-		GlobalSessions, _ = session.NewManager(AppConfig.SessionProvider, AppConfig.SessionName, AppConfig.SessionGCMaxLifetime, AppConfig.SessionSavePath)
+		GlobalSessions, _ = session.NewManager(AppConfig.SessionProvider, AppConfig.SessionName, AppConfig.SessionGCMaxLifetime, AppConfig.SessionSavePath, AppConfig.SessionToUrl)
 		go GlobalSessions.GC()
 	}
 	err := WatchTemplate()

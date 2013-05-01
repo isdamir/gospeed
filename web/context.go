@@ -66,6 +66,22 @@ func (ctx *Context) SetHeader(hdr string, val string, unique bool) {
 		ctx.ResponseWriter.Header().Add(hdr, val)
 	}
 }
+func EnUrl(sess map[interface{}]interface{}, ul string) string {
+	if sess != nil {
+		if v, ok := sess["SessionID"]; ok && AppConfig.SessionToUrl {
+			vs := v.(string)
+			if strings.Index(vs, "?") == -1 {
+				return fmt.Sprintf("%s?%s=%s", ul, AppConfig.SessionName, url.QueryEscape(vs))
+			}
+			if strings.HasSuffix(vs, "&") {
+				return fmt.Sprintf("%s=%s", ul, AppConfig.SessionName, url.QueryEscape(vs))
+			} else {
+				return fmt.Sprintf("&%s=%s", ul, AppConfig.SessionName, url.QueryEscape(vs))
+			}
+		}
+	}
+	return ul
+}
 
 //Sets a cookie -- duration is the amount of time in seconds. 0 = forever
 func (ctx *Context) SetCookie(name string, value string, age int64) {

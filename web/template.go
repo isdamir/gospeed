@@ -39,6 +39,7 @@ func init() {
 	speedTplFuncMap["htmlquote"] = utils.Htmlquote
 	speedTplFuncMap["htmlunquote"] = utils.Htmlunquote
 	speedTplFuncMap["op"] = utils.Operator
+	speedTplFuncMap["enurl"] = EnUrl
 	var err error
 	templateEven, err = fsnotify.NewWatcher()
 	if err != nil {
@@ -167,7 +168,7 @@ func buildGlobalTemplate(dir string) {
 		if err == nil && t != nil {
 			globalTemplate = t
 		} else {
-			log.Warn(err)
+			log.Debug(err)
 		}
 	}
 	buildAllTemplate(AppConfig.ViewsPath)

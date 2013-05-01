@@ -1,11 +1,10 @@
-package session
+package web
 
 import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
 	"io"
-	"iyf.cc/gospeed/log"
 	"net/http"
 	"net/url"
 	"time"
@@ -61,6 +60,18 @@ func NewManager(provideName, cookieName string, maxlifetime int64, savePath stri
 func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (session SessionStore) {
 	cookie, err := r.Cookie(manager.cookieName)
 	if err != nil || cookie.Value == "" {
+		if AppConfig.SessionToUrl {
+			//check has man manager.cookieName in parmeter
+			v := r.Form.Get(manager.cookieName)
+			if v == "" {
+				v = r.PostForm.Get(manager.cookieName)
+			}
+			if v != "" {
+				sid, _ := url.QueryUnescape(v)
+				session, _ = manager.provider.SessionRead(sid)
+				return
+			}
+		}
 		sid := manager.sessionId()
 		session, _ = manager.provider.SessionRead(sid)
 		cookie := http.Cookie{
@@ -68,6 +79,9 @@ func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (se
 			Value: url.QueryEscape(sid),
 			Path:  "/"}
 		cookie.Expires = time.Now().Add(time.Duration(manager.maxlifetime) * time.Second)
+		if AppConfig.SessionToUrl {
+			session.Set("__ToUrl", true)
+		}
 		r.AddCookie(&cookie)
 		http.SetCookie(w, &cookie)
 	} else {
@@ -75,6 +89,9 @@ func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (se
 		cookie.Path = "/"
 		sid, _ := url.QueryUnescape(cookie.Value)
 		session, _ = manager.provider.SessionRead(sid)
+		if AppConfig.SessionToUrl {
+			session.Delete("__ToUrl")
+		}
 		http.SetCookie(w, cookie)
 	}
 	return
@@ -83,7 +100,6 @@ func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (se
 //Destroy sessionid
 func (manager *Manager) SessionDestroy(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie(manager.cookieName)
-	log.Debug("删除session")
 	if err != nil || cookie.Value == "" {
 		return
 	} else {
