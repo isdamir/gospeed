@@ -156,6 +156,7 @@ func (c *Controller) RenderBytes() ([]byte, error) {
 	c.Data["Browser"] = c.Ctx.Browser
 	if c.Ctx.sessionStart {
 		mp := c.Ctx.Session().Map()
+		log.Debug(mp)
 		if _, ok := mp["__ToUrl"]; ok {
 			mp["SessionID"] = c.Ctx.Session().SessionID()
 		}

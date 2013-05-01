@@ -72,7 +72,7 @@ func init() {
 	if err != nil {
 		log.Error(err)
 	}
-	log.SetLevel(AppConfig.LogLevel)
+	log.SetLevelBind(&AppConfig.LogLevel)
 	StaticDir["/static"] = "static"
 	log.Trace(*AppConfig, AppPath)
 }
@@ -175,7 +175,7 @@ func Start() {
 		SpeedApp.Router(`/debug/pprof/:pp([\w]+)`, &ProfController{})
 	}
 	if AppConfig.SessionOn {
-		GlobalSessions, _ = session.NewManager(AppConfig.SessionProvider, AppConfig.SessionName, AppConfig.SessionGCMaxLifetime, AppConfig.SessionSavePath, AppConfig.SessionToUrl)
+		GlobalSessions, _ = session.NewManager(AppConfig.SessionProvider, AppConfig.SessionName, AppConfig.SessionGCMaxLifetime, AppConfig.SessionSavePath, &AppConfig.SessionToUrl)
 		go GlobalSessions.GC()
 	}
 	err := WatchTemplate()

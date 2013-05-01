@@ -1,10 +1,11 @@
-package web
+package session
 
 import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
 	"io"
+	"iyf.cc/gospeed/log"
 	"net/http"
 	"net/url"
 	"time"
@@ -45,30 +46,36 @@ type Manager struct {
 	cookieName  string //private cookiename
 	provider    Provider
 	maxlifetime int64
+	toUrl       *bool
 }
 
-func NewManager(provideName, cookieName string, maxlifetime int64, savePath string) (*Manager, error) {
+func NewManager(provideName, cookieName string, maxlifetime int64, savePath string, tou *bool) (*Manager, error) {
 	provider, ok := provides[provideName]
 	if !ok {
 		return nil, fmt.Errorf("session: unknown provide %q (forgotten import?)", provideName)
 	}
 	provider.SessionInit(maxlifetime, savePath)
-	return &Manager{provider: provider, cookieName: cookieName, maxlifetime: maxlifetime}, nil
+	return &Manager{provider: provider, cookieName: cookieName, maxlifetime: maxlifetime, toUrl: tou}, nil
 }
 
 //get Session
 func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (session SessionStore) {
 	cookie, err := r.Cookie(manager.cookieName)
 	if err != nil || cookie.Value == "" {
-		if AppConfig.SessionToUrl {
+		if *manager.toUrl {
+			if len(r.Form) == 0 {
+				r.ParseForm()
+			}
 			//check has man manager.cookieName in parmeter
 			v := r.Form.Get(manager.cookieName)
+			log.Debug(r.Form)
 			if v == "" {
 				v = r.PostForm.Get(manager.cookieName)
 			}
 			if v != "" {
 				sid, _ := url.QueryUnescape(v)
 				session, _ = manager.provider.SessionRead(sid)
+				session.Set("__ToUrl", true)
 				return
 			}
 		}
@@ -79,7 +86,7 @@ func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (se
 			Value: url.QueryEscape(sid),
 			Path:  "/"}
 		cookie.Expires = time.Now().Add(time.Duration(manager.maxlifetime) * time.Second)
-		if AppConfig.SessionToUrl {
+		if *manager.toUrl {
 			session.Set("__ToUrl", true)
 		}
 		r.AddCookie(&cookie)
@@ -89,7 +96,7 @@ func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (se
 		cookie.Path = "/"
 		sid, _ := url.QueryUnescape(cookie.Value)
 		session, _ = manager.provider.SessionRead(sid)
-		if AppConfig.SessionToUrl {
+		if *manager.toUrl {
 			session.Delete("__ToUrl")
 		}
 		http.SetCookie(w, cookie)
