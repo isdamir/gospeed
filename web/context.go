@@ -82,7 +82,7 @@ cookie[4] => domain string
 cookie[5] => httpOnly bool
 cookie[6] => secure bool
 */
-func (ctx *Context) SetCookie(w http.ResponseWriter, args ...interface{}) *http.Cookie {
+func (ctx *Context) SetCookie(args ...interface{}) *http.Cookie {
 	if len(args) < 2 {
 		return nil
 	}
@@ -154,7 +154,7 @@ func (ctx *Context) SetCookie(w http.ResponseWriter, args ...interface{}) *http.
 		pCookie.Expires = time.Now().Add(d)
 	}
 
-	http.SetCookie(w, pCookie)
+	http.SetCookie(ctx.ResponseWriter, pCookie)
 
 	return pCookie
 }
