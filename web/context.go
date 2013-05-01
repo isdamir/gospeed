@@ -3,6 +3,7 @@ package web
 import (
 	"fmt"
 	"iyf.cc/gospeed/browser"
+	"iyf.cc/gospeed/log"
 	"iyf.cc/gospeed/utils"
 	"iyf.cc/gospeed/web/session"
 	"mime"
@@ -66,10 +67,10 @@ func (ctx *Context) SetHeader(hdr string, val string, unique bool) {
 		ctx.ResponseWriter.Header().Add(hdr, val)
 	}
 }
-func EnUrl(sess map[interface{}]interface{}, ul string) string {
-	if sess != nil {
-		if v, ok := sess["SessionID"]; ok && AppConfig.SessionToUrl {
-			vs := v.(string)
+func (ctx *Context) EnUrl(ul string) string {
+	if AppConfig.SessionToUrl {
+		if _, ok := ctx.Session().Map()["__ToUrl"]; ok {
+			vs := ctx.Session().SessionID()
 			if strings.Index(vs, "?") == -1 {
 				return fmt.Sprintf("%s?%s=%s", ul, AppConfig.SessionName, url.QueryEscape(vs))
 			}
@@ -80,6 +81,9 @@ func EnUrl(sess map[interface{}]interface{}, ul string) string {
 			}
 		}
 	}
+	return ul
+}
+func EnUrl(ul string) string {
 	return ul
 }
 

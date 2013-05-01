@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
-	"iyf.cc/gospeed/log"
 	"net/http"
 	"net/url"
 	"time"
@@ -68,7 +67,6 @@ func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (se
 			}
 			//check has man manager.cookieName in parmeter
 			v := r.Form.Get(manager.cookieName)
-			log.Debug(r.Form)
 			if v == "" {
 				v = r.PostForm.Get(manager.cookieName)
 			}

@@ -155,16 +155,20 @@ func (c *Controller) RenderBytes() ([]byte, error) {
 	c.Data["Custom"] = AppConfig.Custom
 	c.Data["Browser"] = c.Ctx.Browser
 	if c.Ctx.sessionStart {
-		mp := c.Ctx.Session().Map()
-		log.Debug(mp)
-		if _, ok := mp["__ToUrl"]; ok {
-			mp["SessionID"] = c.Ctx.Session().SessionID()
+		c.Data["Session"] = c.Ctx.Session().Map()
+	}
+	var fc template.FuncMap
+	if AppConfig.SessionToUrl {
+		fc = template.FuncMap{}
+		if _, ok := c.Ctx.Session().Map()["__ToUrl"]; ok {
+			fc["enurl"] = c.Ctx.EnUrl
+		} else {
+			fc["enurl"] = EnUrl
 		}
-		c.Data["Session"] = mp
 	}
 	if len(c.tplIn) > 0 {
 		for k, v := range c.tplIn {
-			buf, err := RenderTemplate(v, c.Data)
+			buf, err := RenderTemplate(v, c.Data, fc)
 			if err != nil {
 				log.Debug(err)
 				continue
@@ -172,7 +176,7 @@ func (c *Controller) RenderBytes() ([]byte, error) {
 			c.Data[k] = template.HTML(buf.String())
 		}
 	}
-	buf, err := RenderTemplate(c.tplName, c.Data)
+	buf, err := RenderTemplate(c.tplName, c.Data, fc)
 	if err != nil {
 		log.Trace("template Execute err:", err)
 	}

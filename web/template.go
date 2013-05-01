@@ -39,6 +39,7 @@ func init() {
 	speedTplFuncMap["htmlquote"] = utils.Htmlquote
 	speedTplFuncMap["htmlunquote"] = utils.Htmlunquote
 	speedTplFuncMap["op"] = utils.Operator
+
 	speedTplFuncMap["enurl"] = EnUrl
 	var err error
 	templateEven, err = fsnotify.NewWatcher()
@@ -223,17 +224,21 @@ func ExsitTemplate(file string) bool {
 }
 
 //解析模板
-func RenderTemplate(file string, data map[string]interface{}) (wr *bytes.Buffer, err error) {
+func RenderTemplate(file string, data map[string]interface{}, tm template.FuncMap) (wr *bytes.Buffer, err error) {
 	file = fmt.Sprint(AppConfig.ViewsPath, file)
 	wr = &bytes.Buffer{}
 	t := GetTemplate(file)
 	if t != nil {
-		err = t.ExecuteTemplate(wr, file, data)
+		if len(tm) == 0 {
+			err = t.ExecuteTemplate(wr, file, data)
+		} else {
+			err = t.Funcs(tm).ExecuteTemplate(wr, file, data)
+		}
 		if err != nil {
 			log.Debug("Render:", file, err)
 		}
 	} else {
-		errors.New("no template")
+		err = errors.New("no template")
 		log.Debug("Render:", file, "no template")
 	}
 	return
