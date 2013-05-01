@@ -13,29 +13,30 @@ import (
 	"runtime"
 )
 
-const VERSION = "0.1.0"
+const VERSION = "0.2.0"
 
 type AppConfigData struct {
 	AppName      string
-	HttpAddr     string
+	HttpAddr     string //set "" is bind all adapter
 	HttpPort     int
 	RecoverPanic bool
 	AutoRender   bool
 	PprofOn      bool
 	ViewsPath    string
 	LogLevel     int
-	RunMode      string //"dev" or "prod"
+	RunMode      string //"dev" or "pro"
 	//related to session
 	SessionOn            bool   // wheather auto start session,default is false
 	SessionProvider      string // default session provider  memory mysql redis
 	SessionName          string // sessionName cookie's name
 	SessionGCMaxLifetime int64  // session's gc maxlifetime
 	SessionSavePath      string // session savepath if use mysql/redis/file this set to the connectinfo
+	SessionToUrl         bool   //session save to url,in template ,must use enurl "http://example.com"
 	UseFcgi              bool
 	MaxMemory            int64
-	Custom               map[string]string //自定义信息
 	AutoDevice           bool              //自动设备处理
 	EnableGzip           bool              //是否启用gzip压缩
+	Custom               map[string]string //自定义信息
 }
 
 var (
@@ -52,6 +53,21 @@ func init() {
 	AppPath, _ = os.Getwd()
 	StaticDir = make(map[string]string)
 	AppConfig = &AppConfigData{}
+	//set default
+	AppConfig.AppName = "Test"
+	AppConfig.HttpPort = 80
+	AppConfig.RecoverPanic = true
+	AppConfig.AutoRender = true
+	AppConfig.ViewsPath = "/views"
+	AppConfig.RunMode = "pro"
+	AppConfig.SessionOn = true
+	AppConfig.SessionProvider = "memory"
+	AppConfig.SessionName = "gospeed"
+	AppConfig.SessionGCMaxLifetime = 1440000
+	AppConfig.SessionToUrl = true
+	AppConfig.MaxMemory = 64
+	AppConfig.AutoDevice = true
+	AppConfig.EnableGzip = true
 	err := config.GetConfig().Register("conf/app.json", "WebApp", AppConfig)
 	if err != nil {
 		log.Error(err)
