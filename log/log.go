@@ -20,17 +20,24 @@ const (
 )
 
 // logLevel controls the global log level used by the logger.
-var level = LevelTrace
+var level *int
 
 // LogLevel returns the global log level and can be used in
 // own implementations of the logger interface.
 func Level() int {
-	return level
+	return *level
+}
+func init() {
+	level = new(int)
+	*level = LevelTrace
 }
 
 // SetLogLevel sets the global log level used by the simple
 // logger.
 func SetLevel(l int) {
+	*level = l
+}
+func SetLevelBind(l *int) {
 	level = l
 }
 
@@ -44,42 +51,42 @@ func SetLogger(l *log.Logger) {
 
 // Trace logs a message at trace level.
 func Trace(v ...interface{}) {
-	if level <= LevelTrace {
+	if *level <= LevelTrace {
 		SpeedLogger.Printf("[T] %v\n", v)
 	}
 }
 
 // Debug logs a message at debug level.
 func Debug(v ...interface{}) {
-	if level <= LevelDebug {
+	if *level <= LevelDebug {
 		SpeedLogger.Printf("[D] %v\n", v)
 	}
 }
 
 // Info logs a message at info level.
 func Info(v ...interface{}) {
-	if level <= LevelInfo {
+	if *level <= LevelInfo {
 		SpeedLogger.Printf("[I] %v\n", v)
 	}
 }
 
 // Warning logs a message at warning level.
 func Warn(v ...interface{}) {
-	if level <= LevelWarning {
+	if *level <= LevelWarning {
 		SpeedLogger.Printf("[W] %v\n", v)
 	}
 }
 
 // Error logs a message at error level.
 func Error(v ...interface{}) {
-	if level <= LevelError {
+	if *level <= LevelError {
 		SpeedLogger.Printf("[E] %v\n", v)
 	}
 }
 
 // Critical logs a message at critical level.
 func Critical(v ...interface{}) {
-	if level <= LevelCritical {
+	if *level <= LevelCritical {
 		SpeedLogger.Printf("[C] %v\n", v)
 	}
 }
