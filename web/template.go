@@ -232,6 +232,7 @@ func RenderTemplate(file string, data map[string]interface{}, tm template.FuncMa
 	wr = &bytes.Buffer{}
 	t := GetTemplate(file)
 	if t != nil {
+		log.Trace("Render:", file)
 		if len(tm) == 0 {
 			err = t.ExecuteTemplate(wr, file, data)
 		} else {
