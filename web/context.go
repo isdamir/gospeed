@@ -3,7 +3,6 @@ package web
 import (
 	"fmt"
 	"iyf.cc/gospeed/browser"
-	"iyf.cc/gospeed/log"
 	"iyf.cc/gospeed/utils"
 	"iyf.cc/gospeed/web/session"
 	"mime"

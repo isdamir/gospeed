@@ -107,9 +107,11 @@ func startWatch() {
 		select {
 		case v := <-templateEven.Event:
 			{
+				log.Debug(v.String())
 				log.Trace("File:", v.String())
 				fi, err := os.Stat(v.Name)
 				if err == nil {
+					log.Debug(v.String())
 					if v.IsCreate() || v.IsModify() || v.IsRename() {
 						if strings.Index(v.Name, "_global") != -1 {
 							buildGlobalTemplate(AppConfig.ViewsPath + "_global")
@@ -183,6 +185,7 @@ func buildTemplate(file string) {
 		return
 	}
 	file = strings.Replace(file, "\\", "/", -1)
+	file = strings.Replace(file, "//", "/", -1)
 	log.Trace("build template", file)
 	b, err := ioutil.ReadFile(file)
 	if err != nil {
