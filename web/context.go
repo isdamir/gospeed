@@ -3,9 +3,7 @@ package web
 import (
 	"fmt"
 	"iyf.cc/gospeed/browser"
-	"iyf.cc/gospeed/utils"
 	"iyf.cc/gospeed/web/session"
-	"mime"
 	"mime/multipart"
 	"net/http"
 	"net/url"
@@ -47,18 +45,6 @@ func (ctx *Context) NotFound(message string) {
 	ctx.ResponseWriter.Write([]byte(message))
 }
 
-//Sets the content type by extension, as defined in the mime package.
-//For example, ctx.ContentType("json") sets the content-type to "application/json"
-func (ctx *Context) ContentType(ext string) {
-	if !strings.HasPrefix(ext, ".") {
-		ext = "." + ext
-	}
-	ctype := mime.TypeByExtension(ext)
-	if ctype != "" {
-		ctx.ResponseWriter.Header().Set("Content-Type", ctype)
-	}
-}
-
 func (ctx *Context) SetHeader(hdr string, val string, unique bool) {
 	if unique {
 		ctx.ResponseWriter.Header().Set(hdr, val)
@@ -86,17 +72,91 @@ func EnUrl(ul string) string {
 	return ul
 }
 
-//Sets a cookie -- duration is the amount of time in seconds. 0 = forever
-func (ctx *Context) SetCookie(name string, value string, age int64) {
-	var utctime time.Time
-	if age == 0 {
-		// 2^31 - 1 seconds (roughly 2038)
-		utctime = time.Unix(2147483647, 0)
-	} else {
-		utctime = time.Unix(time.Now().Unix()+age, 0)
+/*
+cookie
+cookie[0] => name string
+cookie[1] => value string
+cookie[2] => expires string
+cookie[3] => path string
+cookie[4] => domain string
+cookie[5] => httpOnly bool
+cookie[6] => secure bool
+*/
+func (ctx *Context) SetCookie(w http.ResponseWriter, args ...interface{}) *http.Cookie {
+	if len(args) < 2 {
+		return nil
 	}
-	cookie := fmt.Sprintf("%s=%s; expires=%s", name, value, utils.WebTime(utctime))
-	ctx.SetHeader("Set-Cookie", cookie, false)
+
+	const LEN = 7
+	var cookie = [LEN]interface{}{}
+
+	for k, v := range args {
+		if k >= LEN {
+			break
+		}
+
+		cookie[k] = v
+	}
+
+	var (
+		name     string
+		value    string
+		expires  int
+		path     string
+		domain   string
+		httpOnly bool
+		secure   bool
+	)
+
+	if v, ok := cookie[0].(string); ok {
+		name = v
+	} else {
+		return nil
+	}
+
+	if v, ok := cookie[1].(string); ok {
+		value = v
+	} else {
+		return nil
+	}
+
+	if v, ok := cookie[2].(int); ok {
+		expires = v
+	}
+
+	if v, ok := cookie[3].(string); ok {
+		path = v
+	}
+
+	if v, ok := cookie[4].(string); ok {
+		domain = v
+	}
+
+	if v, ok := cookie[5].(bool); ok {
+		httpOnly = v
+	}
+
+	if v, ok := cookie[6].(bool); ok {
+		secure = v
+	}
+
+	pCookie := &http.Cookie{
+		Name:     name,
+		Value:    value,
+		Path:     path,
+		Domain:   domain,
+		HttpOnly: httpOnly,
+		Secure:   secure,
+	}
+
+	if expires != 0 {
+		d, _ := time.ParseDuration(strconv.Itoa(expires) + "s")
+		pCookie.Expires = time.Now().Add(d)
+	}
+
+	http.SetCookie(w, pCookie)
+
+	return pCookie
 }
 func (ctx *Context) Params() *url.Values {
 	if ctx.params == nil {
