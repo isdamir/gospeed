@@ -195,14 +195,14 @@ func buildTemplate(file string) {
 	g := GlobalTemplate()
 	if g != nil {
 		g, _ = g.Clone()
-		t, err := g.New(file).Funcs(speedTplFuncMap).Parse(s)
+		t, err := g.New(file).Parse(s)
 		if err == nil && t != nil {
 			Templates[file] = t
 		} else {
 			log.Debug(err)
 		}
 	} else {
-		t, err := template.New(file).Funcs(speedTplFuncMap).Parse(s)
+		t, err := template.New(file).Parse(s)
 		if err == nil && t != nil {
 			Templates[file] = t
 		} else {
