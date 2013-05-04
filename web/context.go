@@ -18,7 +18,6 @@ type Context struct {
 	UrlParams      map[string]string
 	Browser        *browser.BrowserCheck
 	sessionStore   session.SessionStore
-	params         *url.Values
 	sessionStart   bool
 }
 
@@ -159,16 +158,7 @@ func (ctx *Context) SetCookie(args ...interface{}) *http.Cookie {
 	return pCookie
 }
 func (ctx *Context) Params() *url.Values {
-	if ctx.params == nil {
-		ct := ctx.Request.Header.Get("Content-Type")
-		if strings.Contains(ct, "multipart/form-data") {
-			ctx.Request.ParseMultipartForm(AppConfig.MaxMemory) //64MB
-		} else {
-			ctx.Request.ParseForm()
-		}
-		ctx.params = &ctx.Request.Form
-	}
-	return ctx.params
+	return &ctx.Request.Form
 }
 
 //获取传递的参数并转化为string

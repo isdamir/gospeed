@@ -231,7 +231,7 @@ func (c *Controller) templatePath(path, ext string) string {
 					return t
 				}
 			}
-			t := fmt.Sprintf("%s_wap%s", path, ext)
+			t := fmt.Sprintf("%s_xhtml%s", path, ext)
 			if ExsitTemplate(t) {
 				return t
 			}
