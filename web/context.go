@@ -54,14 +54,16 @@ func (ctx *Context) SetHeader(hdr string, val string, unique bool) {
 func (ctx *Context) EnUrl(ul string) string {
 	if AppConfig.SessionToUrl {
 		if _, ok := ctx.Session().Map()["__ToUrl"]; ok {
-			vs := ctx.Session().SessionID()
-			if strings.Index(vs, "?") == -1 {
-				return fmt.Sprintf("%s?%s=%s", ul, AppConfig.SessionName, url.QueryEscape(vs))
-			}
-			if strings.HasSuffix(vs, "&") {
-				return fmt.Sprintf("%s=%s", ul, AppConfig.SessionName, url.QueryEscape(vs))
-			} else {
-				return fmt.Sprintf("&%s=%s", ul, AppConfig.SessionName, url.QueryEscape(vs))
+			if strings.Index(ul, fmt.Sprint(AppConfig.SessionName, "=")) == -1 {
+				vs := ctx.Session().SessionID()
+				if strings.Index(ul, "?") == -1 {
+					return fmt.Sprintf("%s?%s=%s", ul, AppConfig.SessionName, url.QueryEscape(vs))
+				}
+				if strings.HasSuffix(ul, "&") {
+					return fmt.Sprintf("%s=%s", ul, AppConfig.SessionName, url.QueryEscape(vs))
+				} else {
+					return fmt.Sprintf("&%s=%s", ul, AppConfig.SessionName, url.QueryEscape(vs))
+				}
 			}
 		}
 	}
