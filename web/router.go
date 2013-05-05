@@ -383,6 +383,8 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 						r.Method = "UNLINK"
 					case "purge":
 						r.Method = "PURGE"
+					case "post":
+						r.Method = "POST"
 					}
 				}
 				if v := r.PostForm.Get("action"); v != "" {
