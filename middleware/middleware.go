@@ -31,8 +31,7 @@ func Del(key interface{}) {
 }
 
 //一个可以通过用户id来实现同步锁,防止单词快速的重复提交
-func GetUserMutex(userId int) *sync.Mutex {
-	key := string(userId)
+func GetUserMutex(key string) *sync.Mutex {
 	if v := Get(key); v != nil {
 		return v.(*sync.Mutex)
 	} else {
