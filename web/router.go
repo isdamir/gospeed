@@ -238,6 +238,37 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	} else {
 		r.ParseForm()
 	}
+
+	//处理来自参数的信息
+	if r.Method == "GET" || r.Method == "POST" {
+		if v := r.Form.Get("action"); v != "" {
+			switch strings.ToLower(v) {
+			case "delete":
+				r.Method = "DELETE"
+			case "head":
+				r.Method = "HEAD"
+			case "patch":
+				r.Method = "PATCH"
+			case "options":
+				r.Method = "OPTIONS"
+			case "put":
+				r.Method = "PUT"
+			case "link":
+				r.Method = "LINK"
+			case "unlink":
+				r.Method = "UNLINK"
+			case "purge":
+				r.Method = "PURGE"
+			case "post":
+				r.Method = "POST"
+			}
+		}
+		if v := r.PostForm.Get("action"); v != "" {
+			if strings.ToLower(v) == "put" {
+				r.Method = "PUT"
+			}
+		}
+	}
 	//user defined Handler
 	for pattern, c := range p.userHandlers {
 		if c.regex == nil && pattern == requestPath {
@@ -362,37 +393,6 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 
 		//if response has written,yes don't run next
 		if !w.started {
-
-			//处理来自参数的信息
-			if r.Method == "GET" || r.Method == "POST" {
-				if v := r.Form.Get("action"); v != "" {
-					switch strings.ToLower(v) {
-					case "delete":
-						r.Method = "DELETE"
-					case "head":
-						r.Method = "HEAD"
-					case "patch":
-						r.Method = "PATCH"
-					case "options":
-						r.Method = "OPTIONS"
-					case "put":
-						r.Method = "PUT"
-					case "link":
-						r.Method = "LINK"
-					case "unlink":
-						r.Method = "UNLINK"
-					case "purge":
-						r.Method = "PURGE"
-					case "post":
-						r.Method = "POST"
-					}
-				}
-				if v := r.PostForm.Get("action"); v != "" {
-					if strings.ToLower(v) == "put" {
-						r.Method = "PUT"
-					}
-				}
-			}
 			//通过switch来筛选,防止出现恶意的Method
 			switch r.Method {
 			case "GET":
