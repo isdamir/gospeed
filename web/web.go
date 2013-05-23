@@ -154,11 +154,6 @@ func RouterHandler(path string, c http.Handler) *App {
 	return SpeedApp
 }
 
-func Errorhandler(err string, h http.HandlerFunc) *App {
-	ErrorMaps[err] = h
-	return SpeedApp
-}
-
 func Filter(filter FilterRegistor) *App {
 	SpeedApp.Filter(filter)
 	return SpeedApp

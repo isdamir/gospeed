@@ -1,6 +1,7 @@
 package web
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -169,15 +170,48 @@ var errtpl = `
 </html>
 `
 
-var ErrorMaps map[string]http.HandlerFunc
+var errorMaps map[int]func() []byte
 
 func init() {
-	ErrorMaps = make(map[string]http.HandlerFunc)
+	errorMaps = make(map[int]func() []byte)
+}
+func ErrorCode(rw http.ResponseWriter, code int) {
+	if v, ok := errorMaps[code]; ok {
+		rw.Header().Set("Content-Type", "text/html; charset=utf-8")
+		rw.WriteHeader(code)
+		rw.Write(v())
+	}
+}
+
+func registerErrorHander() {
+	if _, ok := errorMaps[404]; !ok {
+		errorMaps[404] = notFound
+	}
+
+	if _, ok := errorMaps[401]; !ok {
+		errorMaps[401] = unauthorized
+	}
+
+	if _, ok := errorMaps[403]; !ok {
+		errorMaps[403] = forbidden
+	}
+
+	if _, ok := errorMaps[503]; !ok {
+		errorMaps[503] = serviceUnavailable
+	}
+
+	if _, ok := errorMaps[500]; !ok {
+		errorMaps[500] = internalServerError
+	}
+}
+
+func ErrorCodeReg(code int, f func() []byte) {
+	errorMaps[code] = f
 }
 
 //404
-func NotFound(rw http.ResponseWriter, r *http.Request) {
-	t, _ := template.New("beegoerrortemp").Parse(errtpl)
+func notFound() []byte {
+	t, _ := template.New("errortemp").Parse(errtpl)
 	data := make(map[string]interface{})
 	data["Title"] = "Page Not Found"
 	data["Content"] = template.HTML("<br>The Page You have requested flown the coop." +
@@ -189,12 +223,14 @@ func NotFound(rw http.ResponseWriter, r *http.Request) {
 		"<br>You like 404 pages" +
 		"</ul>")
 	data["SpeedVersion"] = VERSION
-	t.Execute(rw, data)
+	wr := &bytes.Buffer{}
+	t.Execute(wr, data)
+	return wr.Bytes()
 }
 
 //401
-func Unauthorized(rw http.ResponseWriter, r *http.Request) {
-	t, _ := template.New("beegoerrortemp").Parse(errtpl)
+func unauthorized() []byte {
+	t, _ := template.New("errortemp").Parse(errtpl)
 	data := make(map[string]interface{})
 	data["Title"] = "Unauthorized"
 	data["Content"] = template.HTML("<br>The Page You have requested can't authorized." +
@@ -204,12 +240,14 @@ func Unauthorized(rw http.ResponseWriter, r *http.Request) {
 		"<br>Check the address for errors" +
 		"</ul>")
 	data["SpeedVersion"] = VERSION
-	t.Execute(rw, data)
+	wr := &bytes.Buffer{}
+	t.Execute(wr, data)
+	return wr.Bytes()
 }
 
 //403
-func Forbidden(rw http.ResponseWriter, r *http.Request) {
-	t, _ := template.New("beegoerrortemp").Parse(errtpl)
+func forbidden() []byte {
+	t, _ := template.New("errortemp").Parse(errtpl)
 	data := make(map[string]interface{})
 	data["Title"] = "Forbidden"
 	data["Content"] = template.HTML("<br>The Page You have requested forbidden." +
@@ -220,12 +258,14 @@ func Forbidden(rw http.ResponseWriter, r *http.Request) {
 		"<br>You need to log in" +
 		"</ul>")
 	data["SpeedVersion"] = VERSION
-	t.Execute(rw, data)
+	wr := &bytes.Buffer{}
+	t.Execute(wr, data)
+	return wr.Bytes()
 }
 
 //503
-func ServiceUnavailable(rw http.ResponseWriter, r *http.Request) {
-	t, _ := template.New("beegoerrortemp").Parse(errtpl)
+func serviceUnavailable() []byte {
+	t, _ := template.New("errortemp").Parse(errtpl)
 	data := make(map[string]interface{})
 	data["Title"] = "Service Unavailable"
 	data["Content"] = template.HTML("<br>The Page You have requested unavailable." +
@@ -235,12 +275,14 @@ func ServiceUnavailable(rw http.ResponseWriter, r *http.Request) {
 		"<br>Please try again later." +
 		"</ul>")
 	data["SpeedVersion"] = VERSION
-	t.Execute(rw, data)
+	wr := &bytes.Buffer{}
+	t.Execute(wr, data)
+	return wr.Bytes()
 }
 
 //500
-func InternalServerError(rw http.ResponseWriter, r *http.Request) {
-	t, _ := template.New("beegoerrortemp").Parse(errtpl)
+func internalServerError() []byte {
+	t, _ := template.New("errortemp").Parse(errtpl)
 	data := make(map[string]interface{})
 	data["Title"] = "Internal Server Error"
 	data["Content"] = template.HTML("<br>The Page You have requested has down now." +
@@ -249,27 +291,7 @@ func InternalServerError(rw http.ResponseWriter, r *http.Request) {
 		"<br>you should report the fault to the website administrator" +
 		"</ul>")
 	data["SpeedVersion"] = VERSION
-	t.Execute(rw, data)
-}
-
-func registerErrorHander() {
-	if _, ok := ErrorMaps["404"]; !ok {
-		ErrorMaps["404"] = NotFound
-	}
-
-	if _, ok := ErrorMaps["401"]; !ok {
-		ErrorMaps["401"] = Unauthorized
-	}
-
-	if _, ok := ErrorMaps["403"]; !ok {
-		ErrorMaps["403"] = Forbidden
-	}
-
-	if _, ok := ErrorMaps["503"]; !ok {
-		ErrorMaps["503"] = ServiceUnavailable
-	}
-
-	if _, ok := ErrorMaps["500"]; !ok {
-		ErrorMaps["500"] = InternalServerError
-	}
+	wr := &bytes.Buffer{}
+	t.Execute(wr, data)
+	return wr.Bytes()
 }
