@@ -58,7 +58,7 @@ func (st *MysqlSessionStore) SessionID() string {
 }
 
 func (st *MysqlSessionStore) updatemysql() {
-	if len(fs.values) > 0 {
+	if len(st.values) > 0 {
 		b, err := encodeGob(st.values)
 		if err != nil {
 			return
