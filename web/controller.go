@@ -186,7 +186,9 @@ func (c *Controller) RenderBytes() ([]byte, error) {
 func (c *Controller) Redirect(url string, code int) {
 	c.Ctx.Redirect(url, code)
 }
-
+func (c *Controller) Abort(code string) {
+	panic(code)
+}
 func (c *Controller) ServeJson(data interface{}) {
 	content, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
