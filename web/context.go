@@ -212,15 +212,15 @@ func (ctx *Context) SessionRelease() {
 	}
 }
 
-func (ctx *Context) SessionSet(name string, value interface{}) {
+func (ctx *Context) SessionSet(name, value interface{}) {
 	ctx.Session().Set(name, value)
 }
 
-func (ctx *Context) SessionGet(name string) interface{} {
+func (ctx *Context) SessionGet(name interface{}) interface{} {
 	return ctx.Session().Get(name)
 }
 
-func (ctx *Context) SessionDel(name string) {
+func (ctx *Context) SessionDel(name interface{}) {
 	ctx.Session().Delete(name)
 }
 func (ctx *Context) SessionDestroy() {

@@ -63,9 +63,11 @@ func (fs *FileSessionStore) SessionRelease() {
 func (fs *FileSessionStore) updatecontent() {
 	fs.lock.Lock()
 	defer fs.lock.Unlock()
-	b, err := encodeGob(fs.values)
-	if err == nil {
-		ioutil.WriteFile(fs.f, b, os.ModePerm)
+	if len(fs.values) > 0 {
+		b, err := encodeGob(fs.values)
+		if err == nil {
+			ioutil.WriteFile(fs.f, b, os.ModePerm)
+		}
 	}
 }
 
