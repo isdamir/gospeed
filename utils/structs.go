@@ -5,10 +5,12 @@ import (
 	"reflect"
 	"strings"
 )
+
 //用于方便的处理Struct的一些信息
 type Struct struct {
 	I interface{}
 }
+
 //获取类型信息
 func (s Struct) GetTypeName() string {
 	var typestr string
