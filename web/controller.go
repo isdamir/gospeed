@@ -6,9 +6,9 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"github.com/iyf/gospeed/log"
 	"html/template"
 	"io"
-	"github.com/iyf/gospeed/log"
 	"net/http"
 	"path"
 	"path/filepath"
@@ -154,17 +154,20 @@ func (c *Controller) RenderBytes() ([]byte, error) {
 	}
 	c.Data["Custom"] = AppConfig.Custom
 	c.Data["Browser"] = c.Ctx.Browser
-	if c.Ctx.sessionStart {
-		c.Data["Session"] = c.Ctx.Session().Map()
-	}
-	var fc template.FuncMap
-	if AppConfig.SessionToUrl {
-		fc = template.FuncMap{}
-		if _, ok := c.Ctx.Session().Map()["__ToUrl"]; ok {
-			fc["enurl"] = c.Ctx.EnUrl
-		} else {
-			fc["enurl"] = EnUrl
+	fc := template.FuncMap{}
+	if AppConfig.SessionOn {
+		if c.Ctx.sessionStart {
+			c.Data["Session"] = c.Ctx.Session().Map()
 		}
+		if AppConfig.SessionToUrl {
+			if _, ok := c.Ctx.Session().Map()["__ToUrl"]; ok {
+				fc["enurl"] = c.Ctx.EnUrl
+			} else {
+				fc["enurl"] = EnUrl
+			}
+		}
+	} else {
+		fc["enurl"] = EnUrl
 	}
 	if len(c.tplIn) > 0 {
 		for k, v := range c.tplIn {

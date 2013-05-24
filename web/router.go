@@ -438,7 +438,9 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 					method.Call(in)
 				}
 			}
-			ct.SessionRelease()
+			if AppConfig.SessionOn {
+				ct.SessionRelease()
+			}
 		}
 	}
 
