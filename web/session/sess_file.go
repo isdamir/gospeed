@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"io/ioutil"
-	"iyf.cc/gospeed/log"
+	"github.com/iyf/gospeed/log"
 	"os"
 	"path"
 	"path/filepath"

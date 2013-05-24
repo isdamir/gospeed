@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	"iyf.cc/gospeed/log"
+	"github.com/iyf/gospeed/log"
 	"net/http"
 	"path"
 	"path/filepath"

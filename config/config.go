@@ -8,7 +8,7 @@ import (
 	"errors"
 	"github.com/howeyc/fsnotify"
 	"io/ioutil"
-	"iyf.cc/gospeed/log"
+	"github.com/iyf/gospeed/log"
 	"os"
 	"path/filepath"
 	"strings"

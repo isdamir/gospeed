@@ -2,9 +2,9 @@ package web
 
 import (
 	"fmt"
-	"iyf.cc/gospeed/config"
-	"iyf.cc/gospeed/log"
-	"iyf.cc/gospeed/web/session"
+	"github.com/iyf/gospeed/config"
+	"github.com/iyf/gospeed/log"
+	"github.com/iyf/gospeed/web/session"
 	"net"
 	"net/http"
 	"net/http/fcgi"

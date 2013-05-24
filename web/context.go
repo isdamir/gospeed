@@ -2,8 +2,8 @@ package web
 
 import (
 	"fmt"
-	"iyf.cc/gospeed/browser"
-	"iyf.cc/gospeed/web/session"
+	"github.com/iyf/gospeed/browser"
+	"github.com/iyf/gospeed/web/session"
 	"mime/multipart"
 	"net/http"
 	"net/url"
