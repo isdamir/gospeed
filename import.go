@@ -7,6 +7,7 @@ import (
 	_ "github.com/iyf/gospeed/jsonstate"
 	_ "github.com/iyf/gospeed/log"
 	_ "github.com/iyf/gospeed/middleware"
+	_ "github.com/iyf/gospeed/nettool"
 	_ "github.com/iyf/gospeed/utils"
 	_ "github.com/iyf/gospeed/validate"
 	_ "github.com/iyf/gospeed/web"
