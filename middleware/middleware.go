@@ -30,13 +30,15 @@ func Del(key interface{}) {
 	m.Del(key)
 }
 
-//一个可以通过用户id来实现同步锁,防止单词快速的重复提交
+var mutSafe *SafeMap = NewSafeMap()
+
+//一个可以通过用户id来实现同步锁,防止单次快速的重复提交
 func GetUserMutex(key string) *sync.Mutex {
-	if v := Get(key); v != nil {
+	if v := mutSafe.Get(key); v != nil {
 		return v.(*sync.Mutex)
 	} else {
 		m := &sync.Mutex{}
-		Set(key, m)
+		mutSafe.Set(key, m)
 		return m
 	}
 }
