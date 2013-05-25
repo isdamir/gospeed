@@ -2,6 +2,12 @@
 *.swp
 *.bak
 *.exe
-src/src
-src/tmp/*
+*.sublime-workspace
+src
+tmp/*
 !.gitignore
+bin/
+pkg/
+aiwannet
+aiwannet.zip
+temp/
