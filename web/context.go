@@ -197,7 +197,7 @@ func (ctx *Context) ParamFloat64(key string) (float64, error) {
 
 //返回一个session.SessionStore
 func (ctx *Context) Session() (sess session.SessionStore) {
-	if !ctx.sessionStart {
+	if !ctx.sessionStart && AppConfig.SessionOn {
 		ctx.sessionStore = GlobalSessions.SessionStart(ctx.ResponseWriter, ctx.Request)
 		ctx.sessionStart = true
 	}
