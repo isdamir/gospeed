@@ -36,9 +36,8 @@ var mutSafe *SafeMap = NewSafeMap()
 func GetUserMutex(key string) *sync.Mutex {
 	if v := mutSafe.Get(key); v != nil {
 		return v.(*sync.Mutex)
-	} else {
-		m := &sync.Mutex{}
-		mutSafe.Set(key, m)
-		return m
 	}
+	m := &sync.Mutex{}
+	mutSafe.Set(key, m)
+	return m
 }
