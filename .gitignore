@@ -6,6 +6,7 @@
 src
 tmp/*
 !.gitignore
+!.travis.yml
 bin/
 pkg/
 aiwannet
