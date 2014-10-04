@@ -2,38 +2,38 @@
 package jsonstate
 
 type BoolString struct{
-	S	bool
-	T	string
+	State	bool
+	Data	string
 }
 type BoolInt	struct{
-	S	bool
-	T	int
+	State	bool
+	Data	int
 }
 type BoolState	struct{
-	S	bool
-	T	interface{}
+	State	bool
+	Data	interface{}
 }
 type IntString	struct{
-	S	int
-	T	string
+	State	int
+	Data	string
 }
 type	IntBool	struct{
-	S	int
-	T	string
+	State	int
+	Data	string
 }
 type	IntState struct{
-	S   int
-	T	interface{}
+	State   int
+	Data	interface{}
 }
 type	StringInt	struct{
-	S   string
-	T   int
+	State   string
+	Data   int
 }
 type    StringBool	struct{
-	S   string
-	T   bool
+	State   string
+	Data   bool
 }
 type    StringState	struct{
-	S   string
-	T   interface{}
+	State   string
+	Data   interface{}
 }
