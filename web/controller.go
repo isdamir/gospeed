@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"github.com/iyf/gospeed/log"
+	"github.com/isdamir/gospeed/log"
 	"html/template"
 	"io"
 	"net/http"

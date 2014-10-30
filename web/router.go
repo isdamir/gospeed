@@ -2,8 +2,8 @@ package web
 
 import (
 	"fmt"
-	"github.com/iyf/gospeed/browser"
-	. "github.com/iyf/gospeed/log"
+	"github.com/isdamir/gospeed/browser"
+	. "github.com/isdamir/gospeed/log"
 	"net/http"
 	"net/url"
 	"reflect"

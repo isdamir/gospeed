@@ -3,8 +3,8 @@ package web
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/iyf/gospeed/browser"
-	"github.com/iyf/gospeed/web/session"
+	"github.com/isdamir/gospeed/browser"
+	"github.com/isdamir/gospeed/web/session"
 	"io"
 	"mime/multipart"
 	"net/http"

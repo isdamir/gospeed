@@ -2,14 +2,14 @@
 package gospeed
 
 import (
-	_ "github.com/iyf/gospeed/browser"
-	_ "github.com/iyf/gospeed/config"
-	_ "github.com/iyf/gospeed/jsonstate"
-	_ "github.com/iyf/gospeed/log"
-	_ "github.com/iyf/gospeed/middleware"
-	_ "github.com/iyf/gospeed/utils"
-	_ "github.com/iyf/gospeed/validate"
-	_ "github.com/iyf/gospeed/web"
+	_ "github.com/isdamir/gospeed/browser"
+	_ "github.com/isdamir/gospeed/config"
+	_ "github.com/isdamir/gospeed/jsonstate"
+	_ "github.com/isdamir/gospeed/log"
+	_ "github.com/isdamir/gospeed/middleware"
+	_ "github.com/isdamir/gospeed/utils"
+	_ "github.com/isdamir/gospeed/validate"
+	_ "github.com/isdamir/gospeed/web"
 )
 
 const (

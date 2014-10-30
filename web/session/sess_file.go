@@ -3,8 +3,8 @@ package session
 import (
 	"bytes"
 	"encoding/gob"
+	"github.com/isdamir/gospeed/log"
 	"io/ioutil"
-	"github.com/iyf/gospeed/log"
 	"os"
 	"path"
 	"path/filepath"
