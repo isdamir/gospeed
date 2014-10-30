@@ -199,7 +199,7 @@ func (c *Controller) ServeJson(data interface{}) {
 		return
 	}
 	c.Ctx.SetHeader("Content-Length", strconv.Itoa(len(content)), true)
-	c.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json")
+	c.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
 	c.Ctx.ResponseWriter.Write(content)
 }
 
@@ -210,7 +210,7 @@ func (c *Controller) ServeXml(data interface{}) {
 		return
 	}
 	c.Ctx.SetHeader("Content-Length", strconv.Itoa(len(content)), true)
-	c.Ctx.ResponseWriter.Header().Set("Content-Type", "application/xml")
+	c.Ctx.ResponseWriter.Header().Set("Content-Type", "application/xml; charset=utf-8")
 	c.Ctx.ResponseWriter.Write(content)
 }
 func (c *Controller) ServeTpl(tplpath string) {

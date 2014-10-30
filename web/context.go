@@ -1,9 +1,11 @@
 package web
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/iyf/gospeed/browser"
 	"github.com/iyf/gospeed/web/session"
+	"io"
 	"mime/multipart"
 	"net/http"
 	"net/url"
@@ -161,6 +163,15 @@ func (ctx *Context) SetCookie(args ...interface{}) *http.Cookie {
 }
 func (ctx *Context) Params() *url.Values {
 	return &ctx.Request.Form
+}
+
+func (ctx *Context) ParseBodyJson(struc interface{}) (err error) {
+	buf := make([]byte, ctx.Request.ContentLength) // 创建缓冲区 buf
+	n, err := io.ReadFull(ctx.Request.Body, buf)
+	if n > 0 && err == nil {
+		err = json.Unmarshal(buf, struc)
+	}
+	return
 }
 
 //获取传递的参数并转化为string

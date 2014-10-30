@@ -70,6 +70,9 @@ func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (se
 			if v == "" {
 				v = r.PostForm.Get(manager.cookieName)
 			}
+			if v == "" {
+				v = r.Header.Get(manager.cookieName)
+			}
 			if v != "" {
 				sid, _ := url.QueryUnescape(v)
 				session, _ = manager.provider.SessionRead(sid)
