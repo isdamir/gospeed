@@ -202,7 +202,17 @@ func (c *Controller) ServeJson(data interface{}) {
 	c.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
 	c.Ctx.ResponseWriter.Write(content)
 }
-
+func (c *Controller) ServeJsonError(data interface{}, code int) {
+	content, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		http.Error(c.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	// c.Ctx.SetHeader("Content-Length", strconv.Itoa(len(content)), true)
+	c.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
+	// c.Ctx.ResponseWriter.Write(content)
+	http.Error(c.Ctx.ResponseWriter, string(content), code)
+}
 func (c *Controller) ServeXml(data interface{}) {
 	content, err := xml.Marshal(data)
 	if err != nil {

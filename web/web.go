@@ -74,7 +74,7 @@ func init() {
 	}
 	log.SetLevelBind(&AppConfig.LogLevel)
 	StaticDir["/static"] = "static"
-	log.Trace(*AppConfig, AppPath)
+	//log.Trace(*AppConfig, AppPath)
 }
 
 type App struct {
