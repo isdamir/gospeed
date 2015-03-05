@@ -8,6 +8,7 @@ import (
 	"errors"
 	"github.com/howeyc/fsnotify"
 	"github.com/isdamir/gospeed/log"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -124,6 +125,14 @@ func (c *Config) Save(name string) error {
 			}
 			return ioutil.WriteFile(en.filepath, b, 0644)
 		}
+	case ".yaml":
+		{
+			b, err := yaml.Marshal(en.data)
+			if err != nil {
+				return err
+			}
+			return ioutil.WriteFile(en.filepath, b, 0644)
+		}
 	}
 	return nil
 }
@@ -191,6 +200,10 @@ func getFileType(path string, in interface{}) (string, error) {
 		if err == nil {
 			return ".xml", nil
 		}
+		err = yaml.Unmarshal(bi, in)
+		if err == nil {
+			return ".yaml", nil
+		}
 		return ".gob", nil
 	}
 	return ext, nil
@@ -218,6 +231,10 @@ func readConfig(cf *configData) error {
 	case ".xml":
 		{
 			return xml.Unmarshal(bi, cf.data)
+		}
+	case ".yaml":
+		{
+			return yaml.Unmarshal(bi, cf.data)
 		}
 	}
 	return nil

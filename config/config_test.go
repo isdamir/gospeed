@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"os"
 	"testing"
-	/*"time"*/
-)
+	/*"time"*/)
 
 type test struct {
 	I int
@@ -101,6 +100,34 @@ func TestXml(t *testing.T) {
 		t.FailNow()
 	}
 	defer os.Remove("test.xml")
+}
+func TestYaml(t *testing.T) {
+	cf := GetConfig()
+	te := &test{}
+	cf.Register("test.yaml", "testyaml", te)
+	te.B = true
+	te.I = 10
+	te.S = "测试信息"
+	cf.Save("testyaml")
+	cf.Close("testyaml")
+	tet := &test{}
+	cf.Register("test.yaml", "testyaml", tet)
+	if tet.B != te.B || tet.I != te.I || tet.S != te.S {
+		fmt.Println("读取的信息不正确")
+		t.FailNow()
+	}
+	tet.B = false
+	tet.S = "Test"
+	bd, err := GetConfig().Get("testyaml")
+	if err != nil {
+		t.FailNow()
+	}
+	tx := bd.(*test)
+	if tet.B != tx.B || tet.I != tx.I || tet.S != tx.S {
+		fmt.Println("读取对象信息不正确")
+		t.FailNow()
+	}
+	defer os.Remove("test.yaml")
 }
 
 func TestJsonNone(t *testing.T) {
